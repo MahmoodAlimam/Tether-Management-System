@@ -19,7 +19,7 @@
 
 void initializeThrusters(Servo, Servo);
 void initializeActuator(Servo);
-void handleCommand(Servo, Servo, Servo, String*);
+void handleCommand(Servo, Servo, Servo, int,String*);
 //String getField(String, int);
 
 void resetSystem(void);
@@ -27,8 +27,8 @@ void resetSystem(void);
 int parseUSBLMessage(String*, String);
 uint8_t computeCRC8(const char*, size_t);
 
-void moveForward(Servo, int);
-void moveBackward(Servo, int);
+void moveForward(Servo, int, Servo,int);
+void moveBackward(Servo, int, Servo,int);
 void moveLeft(Servo, Servo, Servo, int);
 void moveRight(Servo, Servo, Servo, int);
 void stopThrust(Servo, Servo, Servo);

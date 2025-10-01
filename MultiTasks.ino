@@ -19,11 +19,12 @@ float xAcc, yAcc, zAcc;
 void taskRunCommand_callback();
 void taskRollControl_callback();
 
-//Global command message
-//static String usblStreamcommands[]={"$FWD,1700","$STP,1500","$BWD,1300","$STP,1500","$LFT,1700","$STP,1500","$RGT,1300","$STP,1500"};
-static String usblStreamcommands[]={"$FWD,1600","$STP,1500","$BWD,1400","$STP,1500"};
-int numberofCommands = 4;
+//Global parameters
+static String usblStreamcommands[]={"$FWD,1600","$STP,1500","$BWD,1400","$STP,1500","$LFT,1600","$STP,1500","$RGT,1400","$STP,1500"};
+//static String usblStreamcommands[]={"$FWD,1600","$STP,1500","$BWD,1400","$STP,1500"};
+int numberofCommands = 8;
 static int cmdSeq = 0;
+static int angle;
 
 //List of tasks
 Task taskRunCommand(3000, TASK_FOREVER, &taskRunCommand_callback, &runner, true);
@@ -87,7 +88,7 @@ void taskRunCommand_callback()
  int re;
     Serial.print("Command sequence = "); Serial.println(cmdSeq);
     re = parseUSBLMessage(cmdField, usblStreamcommands[cmdSeq]);
-    handleCommand(thrustFrntBck, thrustLftRght, rotary, cmdField);
+    handleCommand(thrustFrntBck, thrustLftRght, rotary, angle, cmdField);
   
     cmdSeq = (cmdSeq+1)% numberofCommands;
 

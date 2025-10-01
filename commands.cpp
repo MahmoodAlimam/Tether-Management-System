@@ -31,42 +31,33 @@ void initializeThrusters(Servo s1, Servo s2)
 
 void initializeActuator(Servo r)
 {
-  //r.attach(7);
   Serial.println("Starting actuator test...");
-
+  
   // Move to 0 degrees
   r.write(0);
   Serial.println("Moved to 0°");
   delay(2000);
-
-  // Move to 90 degrees
-  r.write(90);
-  Serial.println("Moved to 90°");
-  delay(2000);
-
-  // Move to 180 degrees
+  
+  //Align the bottom thruster facing the front of the robot
+  // for (angle = 0; angle <= 180; angle += 10) {
+  //   r.write(angle);
+  //   delay(100);}
   r.write(180);
-  Serial.println("Moved to 180°");
-  delay(2000);
 
-  // Return to center
-  r.write(90);
-  Serial.println("Returned to 90°");
-  Serial.println("Actuator initialized");
 }
 
-void handleCommand(Servo thrust1, Servo thrust2, Servo actuate, String* msg) 
+void handleCommand(Servo thrust1, Servo thrust2, Servo actuate,int a, String* msg) 
 {  
   Serial.print("Command =");Serial.println(msg[0]);
   if(msg[0] == "FWD")
   {
    Serial.println("Match FWD");
-   moveForward(thrust1, msg[1].toInt());
+   moveForward(thrust1, msg[1].toInt(),actuate, a);
   }
   else if(msg[0]=="BWD")
   {
    Serial.println("Match BWD"); 
-   moveBackward(thrust1, msg[1].toInt());
+   moveBackward(thrust1, msg[1].toInt(),actuate, a);
   }
   else if(msg[0]=="LFT")
   {
@@ -172,20 +163,35 @@ int parseUSBLMessage(String* fields, String msg) {
   return 0;
 }
 
-void moveForward(Servo thruster, int pwmThrust)
+void moveForward(Servo thruster,int pwmThrust, Servo actuator,int a)
 {
   if (pwmThrust > 1700) 
   { 
     pwmThrust = 1700;  // Constrain maximum speed
   }
-
+  
+  if(a !=180)
+  {
+    for (a = 0; a <= 180; a += 10) {
+    actuator.write(a);
+    delay(100);
+    }
+  }
   thruster.writeMicroseconds(pwmThrust);
   Serial.print("Moving Forward");
   Serial.println(pwmThrust);
 }
 
-void moveBackward(Servo thruster, int pwmThrust)
+void moveBackward(Servo thruster, int pwmThrust, Servo actuator,int a)
 {
+  if(a !=180)
+  {
+    for (a = 0; a <= 180; a += 10) {
+    actuator.write(a);
+    delay(100);
+    }
+  }
+  
   if (pwmThrust < 1300) 
   { 
     pwmThrust = 1300;  // Constrain minimum speed
@@ -203,21 +209,15 @@ void moveLeft(Servo thruster1, Servo thruster2, Servo actuator, int pwmThrust)
     pwmThrust = 1700;  // Constrain minimum speed
   }
   
-  // Move to 90 degrees
-  // actuator.write(0);
-  // delay(2000);
-  // actuator.write(90);
-  // Serial.println("Moving left");
-  // //Serial.println("Moved to 90°");
-  // delay(2000);
-
-for (int angle = 0; angle <= 90; angle += 10) {
+  for (int angle = 0; angle <= 45; angle += 10) 
+  {
     actuator.write(angle);
-    delay(100); } 
+    delay(100); 
+  } 
 
   //Run thrusters
   thruster1.writeMicroseconds(pwmThrust);
-  thruster2.writeMicroseconds(pwmThrust);
+  thruster2.writeMicroseconds(1500-abs(pwmThrust-1500));
   //Display message
   Serial.print("time period for left movement is set to: ");
   Serial.println(pwmThrust);
@@ -236,13 +236,13 @@ void moveRight(Servo thruster1, Servo thruster2, Servo actuator, int pwmThrust)
   // actuator.write(90);
   // Serial.println("Moved Right");
   // delay(2000);  
-for (int angle = 0; angle <= 90; angle += 10) {
+for (int angle = 0; angle <= 45; angle += 10) {
     actuator.write(angle);
     delay(100);}
 
   //Run thrusters
   thruster1.writeMicroseconds(pwmThrust);
-  thruster2.writeMicroseconds(pwmThrust);
+  thruster2.writeMicroseconds(1500+abs(1500-pwmThrust));
   //Display message
   Serial.print("time period for movement right is set to: ");
   Serial.println(pwmThrust);
