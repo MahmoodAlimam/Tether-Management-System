@@ -20,10 +20,10 @@ void initializeThrusters(Servo s1, Servo s2)
 {
   s1.writeMicroseconds(1000);   // Send the minimum throttle signal
   s2.writeMicroseconds(1000);
-  delay(5000);                               
+  delay(4000);                               
   s1.writeMicroseconds(1500);
   s2.writeMicroseconds(1500);   // Send the neutral signal
-  delay(1000);
+  delay(2000);
   Serial.println("ESC armed.");
   delay(1000);
   Serial.println("Thrusters initialized");
@@ -31,7 +31,7 @@ void initializeThrusters(Servo s1, Servo s2)
 
 void initializeActuator(Servo r)
 {
-  r.attach(7);
+  //r.attach(7);
   Serial.println("Starting actuator test...");
 
   // Move to 0 degrees

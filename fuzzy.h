@@ -1,4 +1,9 @@
-#include <Servo.h>         // Include the Servo library for ESC control
+#ifndef FUZZY_H
+#define FUZZY_H
+
+#include <Arduino.h>  
+#include <Servo.h>
+
 #include <Arduino_LSM6DS3.h> // Include the library for the onboard IMU
 
 // --- ESC Control Definitions ---
@@ -16,9 +21,9 @@ const int MAX_PULSE = 1900;  // Maximum pulse width (e.g., full forward)
 // These values define the "breakpoints" for the fuzzy sets.
 // Adjust these based on how sensitive you want the control to be to tilt.
 const float ACCEL_NL_PEAK = -0.7; // Peak for Negative_Large
-const float ACCEL_NS_PEAK = -0.3; // Peak for Negative_Small
+const float ACCEL_NS_PEAK = -0.5; // Peak for Negative_Small
 const float ACCEL_ZERO_PEAK = 0.0; // Peak for Zero
-const float ACCEL_PS_PEAK = 0.3;  // Peak for Positive_Small
+const float ACCEL_PS_PEAK = 0.5;  // Peak for Positive_Small
 const float ACCEL_PL_PEAK = 0.7;  // Peak for Positive_Large
 
 // Overlap points for triangular membership functions
@@ -36,4 +41,11 @@ const float MOTOR_SF = 0.5;  // Slow Forward
 const float MOTOR_FF = 1.0;  // Full Forward
 
 // Variables to store accelerometer data
-float xAcc, yAcc, zAcc;
+
+
+//Function declaration
+float getMembership(float, float, float, float);
+float mapFloat(float, float, float, float, float);
+void setMotorPulse(Servo,int);
+void stopMotor(Servo);
+#endif
