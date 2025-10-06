@@ -16,7 +16,7 @@
 #define S3 9  // Connect S3 pin of TCS3200 to Arduino Digital Pin 5
 #define OUT 8 // Connect OUT pin of TCS3200 to Arduino Digital Pin 6
 
-
+static int angle;
 void initializeThrusters(Servo, Servo);
 void initializeActuator(Servo);
 void handleCommand(Servo, Servo, Servo, int,String*);
@@ -27,8 +27,8 @@ void resetSystem(void);
 int parseUSBLMessage(String*, String);
 uint8_t computeCRC8(const char*, size_t);
 
-void moveForward(Servo, int, Servo,int);
-void moveBackward(Servo, int, Servo,int);
+void moveForward(Servo, int, Servo);
+void moveBackward(Servo, int, Servo);
 void moveLeft(Servo, Servo, Servo, int);
 void moveRight(Servo, Servo, Servo, int);
 void stopThrust(Servo, Servo, Servo);

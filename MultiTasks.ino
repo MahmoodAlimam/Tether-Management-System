@@ -13,7 +13,8 @@ Servo rotary;
 
 //Roll angle with its limit
 volatile float roll= 0;
-const int rollAngleLimit = 20;
+const int rollAngleLimitmin = 80;
+const int rollAngleLimitmax = 100;
 float xAcc, yAcc, zAcc;
 
 void taskRunCommand_callback();
@@ -24,7 +25,7 @@ static String usblStreamcommands[]={"$FWD,1600","$STP,1500","$BWD,1400","$STP,15
 //static String usblStreamcommands[]={"$FWD,1600","$STP,1500","$BWD,1400","$STP,1500"};
 int numberofCommands = 8;
 static int cmdSeq = 0;
-static int angle;
+
 
 //List of tasks
 Task taskRunCommand(3000, TASK_FOREVER, &taskRunCommand_callback, &runner, true);
@@ -66,14 +67,15 @@ void loop()
 {
   IMU.readAcceleration(xAcc, yAcc, zAcc);
   roll = atan2(yAcc, zAcc) * 180.0 / PI;
-  Serial.println(180-abs(roll));
-  // put your main code here, to run repeatedly:
-    if (180-abs(roll) > rollAngleLimit)
+  Serial.println(roll);
+  // Decide what task to start
+    //if (roll < rollAngleLimitmin || roll > rollAngleLimitmax)
+    if(roll < 80 || roll > 100)
     {
       taskRunCommand.disable();
       taskRollControl.enable();
     }
-     else if(180-abs(roll) < rollAngleLimit)// && !taskRunCommand.enable())
+     else 
     {
       taskRunCommand.enable();
       taskRollControl.disable();
@@ -96,14 +98,13 @@ void taskRunCommand_callback()
 
 void taskRollControl_callback()
 {
-    
-    
-    Serial.println("START FUZZY");
     // For this example, we'll use yAcc (forward/backward tilt) as input to fuzzy logic
     IMU.readAcceleration(xAcc, yAcc, zAcc);
-   
-    
-    float accelInput = yAcc;
+    float r = atan2(yAcc, zAcc) * 180.0 / PI;
+    Serial.print("START FUZZY, with roll angle =");
+    Serial.println(r);
+    //Orientation of the IMU is 90 degree 
+    float accelInput = r;
 
     Serial.print("Y-Acc: ");
     Serial.print(accelInput, 3); // Print with 3 decimal places
