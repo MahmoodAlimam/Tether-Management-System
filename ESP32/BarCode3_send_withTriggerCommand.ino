@@ -83,7 +83,7 @@ int handleUSBLmsg(String * msgSerial,String msgBarcode,String msgUsbl)
   }
 
   //extract the message and checksum
-  msgUsbl = msgUsbl.substring(1, asteriskIdx);
+  msgUsbl = msgUsbl.substring(0, asteriskIdx);
 
   //Convert string checksum into integer
   //uint8_t crcInt = strtoul(crcString.c_str(), NULL, 16);
