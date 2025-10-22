@@ -6,7 +6,7 @@
 #define RXrs 6
 #define TXrs 7
 
-HardwareSerial rs232Usbl(2), GM65Serial(1), Comm2IoT(0);  // Use UART1
+HardwareSerial rs232Usbl(1), GM65Serial(2), Comm2IoT(0);  // Use UART1
 byte autoScan[] = {0x7E, 0x00, 0x08,0x01, 0x00, 0x02, 0x01, 0xAB, 0xCD};
 
 void setup() {
@@ -21,17 +21,18 @@ void loop() {
   int r;
   static String barcode = "";
   static String Data="";
-  static String msgUsbl = "$FWD,1700*32";
+  static String msgUsbl = "$FWD,1600*32";
   static String msg2IoT="";
     
     rs232Usbl.println(msgUsbl);
     Data = Scan_QR();
     
-    r = handleUSBLmsg(&msg2IoT,Data,msgUsbl);
+    
     
     if(rs232Usbl.available())
     {
       String c = rs232Usbl.readStringUntil('\n');
+      r = handleUSBLmsg(&msg2IoT,Data,c);
       
       if(c.length()>0)
       {
@@ -40,9 +41,7 @@ void loop() {
       
 
     }
-    
-    
-    
+ 
     delay(2000);
   
 }
