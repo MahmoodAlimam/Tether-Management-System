@@ -27,8 +27,8 @@ void resetSystem(void);
 int parseUSBLMessage(String*, String);
 uint8_t computeCRC8(const char*, size_t);
 
-void moveForward(Servo, int, Servo);
-void moveBackward(Servo, int, Servo);
+void moveForward(Servo, Servo, int, Servo);
+void moveBackward(Servo, Servo, int, Servo);
 void moveLeft(Servo, Servo, Servo, int);
 void moveRight(Servo, Servo, Servo, int);
 void stopThrust(Servo, Servo, Servo);

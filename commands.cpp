@@ -18,14 +18,13 @@ void configureCamera()
 }
 void initializeThrusters(Servo s1, Servo s2)
 {
-  s1.writeMicroseconds(1000);   // Send the minimum throttle signal
-  s2.writeMicroseconds(1000);
-  delay(4000);                               
-  s1.writeMicroseconds(1500);
-  s2.writeMicroseconds(1500);   // Send the neutral signal
+  //s1.writeMicroseconds(1000);   // Send the minimum throttle signal
+  //s2.writeMicroseconds(1000);
+  delay(2000);                               
+  s1.writeMicroseconds(1465);
+  s2.writeMicroseconds(1450);   // Send the neutral signal
   delay(2000);
   Serial.println("ESC armed.");
-  delay(1000);
   Serial.println("Thrusters initialized");
 }
 
@@ -52,12 +51,12 @@ void handleCommand(Servo thrust1, Servo thrust2, Servo actuate,int a, String* ms
   if(msg[0] == "FWD")
   {
    Serial.println("Match FWD");
-   moveForward(thrust1, msg[1].toInt(),actuate);
+   moveForward(thrust1, thrust2,msg[1].toInt(),actuate);
   }
   else if(msg[0]=="BWD")
   {
    Serial.println("Match BWD"); 
-   moveBackward(thrust1, msg[1].toInt(),actuate);
+   moveBackward(thrust1, thrust2,msg[1].toInt(),actuate);
   }
   else if(msg[0]=="LFT")
   {
@@ -158,12 +157,12 @@ int parseUSBLMessage(String* fields, String msg) {
   // Extract values
   int period = fields[1].toInt();
   
-  Serial.print("Command: "); Serial.print(fields[0]); Serial.println(" ");
-  Serial.print("Thruster time period: "); Serial.print(period); Serial.println(" ");
+  //Serial.print("Command: "); Serial.print(fields[0]); Serial.println(" ");
+  //Serial.print("Thruster time period: "); Serial.print(period); Serial.println(" ");
   return 0;
 }
 
-void moveForward(Servo thruster,int pwmThrust, Servo actuator)
+void moveForward(Servo thrust1,Servo thrust2,int pwmThrust, Servo actuator)
 {
   int a;
   if (pwmThrust > 1700) 
@@ -175,14 +174,14 @@ void moveForward(Servo thruster,int pwmThrust, Servo actuator)
     actuator.write(a);
     delay(100);
     }
-    angle = a;
-  
-  thruster.writeMicroseconds(pwmThrust);
+    
+  thrust2.writeMicroseconds(1500);
+  thrust1.writeMicroseconds(pwmThrust-35);
   Serial.print("Moving Forward");
   Serial.println(pwmThrust);
 }
 
-void moveBackward(Servo thruster, int pwmThrust, Servo actuator)
+void moveBackward(Servo thrust1, Servo thrust2,int pwmThrust, Servo actuator)
 {
   int a;
   //Adjusting angle of the thruster
@@ -192,15 +191,15 @@ void moveBackward(Servo thruster, int pwmThrust, Servo actuator)
     actuator.write(a);
     delay(100);
     }
-    angle = a;
+    
   
   
   if (pwmThrust < 1300) 
   { 
     pwmThrust = 1300;  // Constrain minimum speed
   }
-  
-  thruster.writeMicroseconds(pwmThrust);
+  thrust2.writeMicroseconds(1500);
+  thrust1.writeMicroseconds(pwmThrust);
   Serial.print("Moving Backward");
   Serial.println(pwmThrust);
 }
@@ -213,7 +212,7 @@ void moveLeft(Servo thruster1, Servo thruster2, Servo actuator, int pwmThrust)
     pwmThrust = 1700;  // Constrain minimum speed
   }
   
-  for (a = 0; a <= 45; a += 10) 
+  for (a = 0; a <= 60; a += 10) 
   {
     actuator.write(a);
     delay(100); 
@@ -221,7 +220,7 @@ void moveLeft(Servo thruster1, Servo thruster2, Servo actuator, int pwmThrust)
   angle = a;
 
   //Run thrusters
-  thruster1.writeMicroseconds(pwmThrust);
+  thruster1.writeMicroseconds(pwmThrust-35);
   thruster2.writeMicroseconds(1500-abs(pwmThrust-1500));
   //Display message
   Serial.print("time period for left movement is set to: ");
@@ -242,15 +241,15 @@ void moveRight(Servo thruster1, Servo thruster2, Servo actuator, int pwmThrust)
   // actuator.write(90);
   // Serial.println("Moved Right");
   // delay(2000);  
-for ( a = 0; angle <= 45; angle += 10) {
+for ( a = 0; a <= 60; a += 10) {
     actuator.write(a);
     delay(100);
     }
     angle = a;
 
   //Run thrusters
-  thruster1.writeMicroseconds(pwmThrust);
-  thruster2.writeMicroseconds(1500+abs(1500-pwmThrust));
+  thruster1.writeMicroseconds(pwmThrust-35); //a shift in the arming pulse by 35ns
+  thruster2.writeMicroseconds(1500+abs(1500-pwmThrust+35)); //the same shift of 35ns
   //Display message
   Serial.print("time period for movement right is set to: ");
   Serial.println(pwmThrust);
@@ -260,8 +259,8 @@ void stopThrust(Servo thruster1, Servo thruster2, Servo actuate)
 {
   actuate.write(0);
   delay(2000);
-  thruster1.writeMicroseconds(1500);
-  thruster2.writeMicroseconds(1500);
+  thruster1.writeMicroseconds(1465);
+  thruster2.writeMicroseconds(1450);
 
 }
 

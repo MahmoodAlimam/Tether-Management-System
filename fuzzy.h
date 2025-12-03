@@ -20,11 +20,11 @@ const int MAX_PULSE = 1600;  // Maximum pulse width (e.g., full forward)
 // Input (Accelerometer Y-axis 'g' values) ranges for membership functions
 // These values define the "breakpoints" for the fuzzy sets.
 // Adjust these based on how sensitive you want the control to be to tilt.
-const float ACCEL_NL_PEAK = 70; // Peak for Negative_Large
-const float ACCEL_NS_PEAK = 80; // Peak for Negative_Small
-const float ACCEL_ZERO_PEAK = 90; // Peak for Zero
-const float ACCEL_PS_PEAK = 100;  // Peak for Positive_Small
-const float ACCEL_PL_PEAK = 120;  // Peak for Positive_Large
+const float ACCEL_NL_PEAK = 0; // Peak for Negative_Large
+const float ACCEL_NS_PEAK = -30; // Peak for Negative_Small
+const float ACCEL_ZERO_PEAK = -90; // Peak for Zero
+const float ACCEL_PS_PEAK = -150;  // Peak for Positive_Small
+const float ACCEL_PL_PEAK = -180;  // Peak for Positive_Large
 
 // Overlap points for triangular membership functions
 // Example: Negative_Large goes from -1.0 to -0.3, peaking at -0.7
