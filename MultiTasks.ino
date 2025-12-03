@@ -1,10 +1,16 @@
+#include <CircularBuffer.hpp>
 #include <TaskScheduler.h>
 #include <Servo.h>
 #include "commands.h"
 #include "fuzzy.h"
 
+#define BUF_SIZE 10
+
 //Create the scheduler
 Scheduler runner;
+
+//Create a buffer for the message received from ESP32
+CircularBuffer<String,BUF_SIZE> queue;
 
 //Create servo objects
 Servo thrustFrntBck;  
@@ -21,23 +27,21 @@ void taskRunCommand_callback();
 void taskRollControl_callback();
 
 //Global parameters
-static String usblStreamcommands[]={"$FWD,1600","$STP,1500","$BWD,1400","$STP,1500","$LFT,1600","$STP,1500","$RGT,1400","$STP,1500"};
-//static String usblStreamcommands[]={"$FWD,1600","$STP,1500","$BWD,1400","$STP,1500"};
-int numberofCommands = 8;
+static String usblStreamcommands;
 static int cmdSeq = 0;
 
 
 //List of tasks
-Task taskRunCommand(3000, TASK_FOREVER, &taskRunCommand_callback, &runner, true);
+Task taskRunCommand(5000, TASK_FOREVER, &taskRunCommand_callback, &runner, true);
 Task taskRollControl(0,TASK_FOREVER, &taskRollControl_callback, &runner, false);
 
 //Setup of the system
 void setup() 
 {
 // Set delay for 1s
-Serial.begin(9600);
+//Serial.begin(9600);
 delay(1000);
-while(!Serial);
+Serial1.begin(9600);
 
 // Attach the Nano IoT to the specified pin.
 thrustFrntBck.attach(THRUSTER_FrntBck_PIN);
@@ -67,10 +71,10 @@ void loop()
 {
   IMU.readAcceleration(xAcc, yAcc, zAcc);
   roll = atan2(yAcc, zAcc) * 180.0 / PI;
-  Serial.println(roll);
+  //Serial.println(roll);
   // Decide what task to start
     //if (roll < rollAngleLimitmin || roll > rollAngleLimitmax)
-    if(roll < 80 || roll > 100)
+    if(roll > -40 || roll < -140)  //80 and 100
     {
       taskRunCommand.disable();
       taskRollControl.enable();
@@ -88,11 +92,29 @@ void taskRunCommand_callback()
 {
  String cmdField[2];
  int re;
-    Serial.print("Command sequence = "); Serial.println(cmdSeq);
-    re = parseUSBLMessage(cmdField, usblStreamcommands[cmdSeq]);
-    handleCommand(thrustFrntBck, thrustLftRght, rotary, angle, cmdField);
+    
+    // Read the message from NanoESP32
+    
+    if(Serial1.available())
+    {
+      String receivedMessage = Serial1.readStringUntil('\n');  
+
+      if (receivedMessage.length()>0)
+      {
+        Serial.println("receivedMessage and will be pushed to queue");
+        queue.unshift(receivedMessage);
+      }
+    }   
   
-    cmdSeq = (cmdSeq+1)% numberofCommands;
+    //Process received command
+    while(!queue.isEmpty())
+   {
+    usblStreamcommands = queue.pop();
+    Serial.print("usbl Command =");
+    Serial.println(usblStreamcommands);
+    re = parseUSBLMessage(cmdField, usblStreamcommands);
+    handleCommand(thrustFrntBck, thrustLftRght, rotary, angle, cmdField);
+   }   
 
 }
 
